@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  userName String @db.VarChar(255) @unique
+  password String @db.VarChar(255)
+
+  createdAt DateTime?
+  updatedAt DateTime?
+  deletedAt DateTime?
+
+  authentications Authentication[]
+
+  @@map("users")
+}
+
+model Authentication {
+  id Int @id @default(autoincrement())
+  apiKey String @db.VarChar(255) @unique
+  isValid Boolean? @default(false)
+
+  createdAt DateTime?
+  updatedAt DateTime?
+  deletedAt DateTime?
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+ 
+  @@map("authentications")
+}
+
+model Api {
+  id Int @id @default(autoincrement())
+
+  name String @db.VarChar(255)
+  url String @db.Text()
+
+  createdAt DateTime?
+  updatedAt DateTime?
+  deletedAt DateTime?
+
+  @@map("apis")
+
+}
