@@ -1,0 +1,30 @@
+{
+  "name": "simple-api-gateway",
+  "version": "1.0.0",
+  "description": "API gateway to act as a middleman between your microservices",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saptarshi1996/simple-api-gateway.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saptarshi1996/simple-api-gateway/issues"
+  },
+  "homepage": "https://github.com/saptarshi1996/simple-api-gateway#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
