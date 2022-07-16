@@ -52,11 +52,10 @@ model Service {
 
   api Api[]
 
-  @@map("services")
-
   authenticationId Int
   authentication Authentication @relation(fields: [authenticationId], references: [id])
 
+  @@map("services")
 }
 
 model Api {
@@ -73,5 +72,4 @@ model Api {
   service Service @relation(fields: [serviceId], references: [id])
 
   @@map("apis")
-
 }

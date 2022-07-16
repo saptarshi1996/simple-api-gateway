@@ -1,28 +1,33 @@
-const {
-  PrismaClient,
-} = require('@prisma/client');
+const { v4: uuidv4 } = require('uuid');
+const { PrismaClient } = require('@prisma/client');
 
-const {
-  user,
-} = new PrismaClient();
+const userHelper = require('../helpers/user');
+
+const { user, authentication } = new PrismaClient();
 
 exports.createUser = async (req, res) => {
   try {
-    const {
-      userName,
-      password,
-    } = req.body;
+    const { userName, password } = req.body;
 
-    const userFound = await user.findFirst({
-      where: {
+    const userFound = await userHelper.getUser({
+      userName,
+    });
+
+    if (userFound) {
+      return res.status(400).json({
+        message: 'User already exists',
+      });
+    }
+
+    const hash = userHelper.hashPassword({ password });
+    await user.create({
+      data: {
         userName,
-      },
-      select: {
-        password: true,
+        password: hash,
       }
     });
 
-    return res.json(200).json({
+    return res.status(200).json({
       message: 'User created successfully',
     });
   } catch (ex) {
@@ -34,29 +39,74 @@ exports.createUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    const {
-      userName,
-      password,
-    } = req.body;
+    const { userName, password } = req.body;
 
-    const userFound = await user.findFirst({
-      where: {
-        userName,
-      },
-      select: {
-        password: true,
-        id: true,
-      }
+    const userFound = await userHelper.getUser({
+      userName,
     });
 
     if (!userFound) {
-      return res.json(404).status({
+      return res.status(404).json({
         message: 'User does not exists',
       });
     }
 
+    const validPassword = userHelper.comparePassword({
+      password,
+      hash: userFound.password,
+    });
+
+    if (!validPassword) {
+      return res.status(403).json({
+        message: 'Invalid credentials',
+      });
+    }
+
+    const token = await userHelper.generateToken({
+      id: userFound.id,
+    });
+
+    return res.status(200).json({
+      token,
+    });
   } catch (ex) {
-    return res.json(500).message({
+    return res.status(500).json({
+      message: ex.message,
+    });
+  }
+};
+
+exports.generateApiKey = async (req, res) => {
+  try {
+    const apiKey = uuidv4();
+
+    // disable previous API key.
+    await authentication.updateMany({
+      where: {
+        userId: req.user.id,
+      },
+      data: {
+        isValid: false,
+      }
+    });
+
+    await authentication.create({
+      data: {
+        userId: req.user.id,
+        apiKey,
+        isValid: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: 'Api Key generate for user',
+      data: {
+        apiKey,
+      },
+    });
+  } catch (ex) {
+    console.log(ex);
+    return res.status(500).json({
       message: ex.message,
     });
   }
