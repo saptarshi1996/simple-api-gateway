@@ -1,9 +1,22 @@
-require('dotenv').config()
+require('dotenv').config();
 
-const { PORT } = process.env
+const path = require('path');
+const express = require('express');
 
-const express = require('express')
+const accessRouter = require('./routes/access');
 
-const app = express()
+const { PORT } = process.env;
 
-app.listen(PORT, () => console.log(`Server on PORT ${PORT}`))
+const app = express();
+
+const router = express.Router();
+
+app.use(express.static('dist'));
+
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+app.use('/access', accessRouter);
+
+app.listen(PORT, () => console.log(`Server on PORT ${PORT}`));

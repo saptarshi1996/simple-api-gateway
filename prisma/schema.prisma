@@ -35,8 +35,28 @@ model Authentication {
 
   userId Int
   user User @relation(fields: [userId], references: [id])
+
+  services Service[]
  
   @@map("authentications")
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+
+  name String @db.VarChar(255)
+
+  createdAt DateTime?
+  updatedAt DateTime?
+  deletedAt DateTime?
+
+  api Api[]
+
+  @@map("services")
+
+  authenticationId Int
+  authentication Authentication @relation(fields: [authenticationId], references: [id])
+
 }
 
 model Api {
@@ -48,6 +68,9 @@ model Api {
   createdAt DateTime?
   updatedAt DateTime?
   deletedAt DateTime?
+
+  serviceId Int
+  service Service @relation(fields: [serviceId], references: [id])
 
   @@map("apis")
 
