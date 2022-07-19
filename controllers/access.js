@@ -1,9 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
-const { PrismaClient } = require('@prisma/client');
 
 const userHelper = require('../helpers/user');
-
-const { user, authentication } = new PrismaClient();
+const authenticationHelper = require('../helpers/auth');
 
 exports.createUser = async (req, res) => {
   try {
@@ -20,7 +18,7 @@ exports.createUser = async (req, res) => {
     }
 
     const hash = userHelper.hashPassword({ password });
-    await user.create({
+    await userHelper.createUser({
       data: {
         userName,
         password: hash,
@@ -81,7 +79,7 @@ exports.generateApiKey = async (req, res) => {
     const apiKey = uuidv4();
 
     // disable previous API key.
-    await authentication.updateMany({
+    await authenticationHelper.updateAuthentication({
       where: {
         userId: req.user.id,
       },
@@ -90,7 +88,7 @@ exports.generateApiKey = async (req, res) => {
       }
     });
 
-    await authentication.create({
+    await authenticationHelper.createAuthentication({
       data: {
         userId: req.user.id,
         apiKey,

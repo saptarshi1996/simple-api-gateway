@@ -5,7 +5,11 @@ const express = require('express');
 
 const cors = require('cors');
 
+const accessMiddleware = require('./middlewares/access');
+
 const accessRouter = require('./routes/access');
+const serviceRouter = require('./routes/service');
+const apiRouter = require('./routes/api');
 
 const { PORT } = process.env;
 
@@ -25,5 +29,7 @@ router.get('/', (req, res) => {
 });
 
 app.use('/access', accessRouter);
+app.use('/service', accessMiddleware, serviceRouter);
+app.use('/api', accessMiddleware, apiRouter);
 
 app.listen(PORT, () => console.log(`Server on PORT ${PORT}`));

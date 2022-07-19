@@ -20,6 +20,7 @@ model User {
   deletedAt DateTime?
 
   authentications Authentication[]
+  services Service[]
 
   @@map("users")
 }
@@ -35,8 +36,6 @@ model Authentication {
 
   userId Int
   user User @relation(fields: [userId], references: [id])
-
-  services Service[]
  
   @@map("authentications")
 }
@@ -45,6 +44,8 @@ model Service {
   id Int @id @default(autoincrement())
 
   name String @db.VarChar(255)
+  type String @db.VarChar(255)
+  hostUrl String @db.Text
 
   createdAt DateTime?
   updatedAt DateTime?
@@ -52,8 +53,8 @@ model Service {
 
   api Api[]
 
-  authenticationId Int
-  authentication Authentication @relation(fields: [authenticationId], references: [id])
+  userId Int
+  user User @relation(fields: [userId], references: [id])
 
   @@map("services")
 }
@@ -62,7 +63,8 @@ model Api {
   id Int @id @default(autoincrement())
 
   name String @db.VarChar(255)
-  url String @db.Text()
+  url String @db.Text
+  method String @db.VarChar(255)
 
   createdAt DateTime?
   updatedAt DateTime?
@@ -71,5 +73,24 @@ model Api {
   serviceId Int
   service Service @relation(fields: [serviceId], references: [id])
 
+  // proxy Proxy[]
+
   @@map("apis")
 }
+
+// model Proxy {
+
+//   id Int @id @default(autoincrement())
+//   proxyUrl String @db.Text
+//   rewritePath String? @db.Text
+
+//   createdAt DateTime?
+//   updatedAt DateTime?
+//   deletedAt DateTime?
+
+//   apiId Int
+//   api Api @relation(fields: [apiId], references: [id])
+
+//   @@map("proxies")
+
+// }

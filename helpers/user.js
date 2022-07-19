@@ -9,6 +9,12 @@ const { user, authentication } = new PrismaClient();
 
 const { JWT_SECRET } = process.env;
 
+exports.createUser = ({
+  data,
+}) => user.create({
+  data,
+});
+
 exports.getUser = ({
   id,
   userName,

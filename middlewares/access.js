@@ -3,35 +3,25 @@ const userHelper = require('../helpers/user');
 
 module.exports = async (req, res, next) => {
   try {
-    const { authorization, 'X-API-Key': apiKey } = req.headers;
+    const { 'x-api-key': apiKey } = req.headers;
 
-    // User has provided JWT key.
-    if (authorization) {
-      const validated = await userHelper.validateToken({
-        token: authorization,
+    console.log(req.headers);
+
+    if (!apiKey) {
+      return res.status(403).json({
+        message: 'X-API-Key is missing',
       });
-
-      const user = await userHelper.getUser({
-        id: validated.id,
-      });
-
-      if (validated) {
-        req.user = user;
-        return next();
-      }
     }
 
     // User has provided API key.
-    if (apiKey) {
-      const validApiKey = await userHelper.getApiKey({ apiKey });
-      const userDetails = await userHelper.getUser({
-        id: validApiKey.userId,
-      });
+    const validApiKey = await userHelper.getApiKey({ apiKey });
+    const userDetails = await userHelper.getUser({
+      id: validApiKey.userId,
+    });
 
-      if (validApiKey) {
-        req.user = userDetails;
-        return next();
-      }
+    if (validApiKey) {
+      req.user = userDetails;
+      return next();
     }
 
     return res.status(403).json({
