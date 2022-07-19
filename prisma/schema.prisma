@@ -40,12 +40,19 @@ model Authentication {
   @@map("authentications")
 }
 
+enum ListingType {
+  WHITELIST
+  BLACKLIST
+}
+
 model Service {
   id Int @id @default(autoincrement())
 
   name String @db.VarChar(255)
   type String @db.VarChar(255)
   hostUrl String @db.Text
+
+  listing ListingType @default(BLACKLIST)
 
   createdAt DateTime?
   updatedAt DateTime?
